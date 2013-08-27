@@ -120,8 +120,11 @@ function fetchItem(id, cb) {
             // load URL
             process.stderr.write(url + "\n");
             request(url, function (err, rep, data) {
-                if (err) throw err;
-                if (rep.statusCode == 200) {
+                if (err) {
+                    // ignore error but don't store empty cache file
+                    process.stderr.write("Error: " + err + "\n");
+                    cb(null);
+                } else if (rep.statusCode == 200) {
                     // write cache and parse it
                     fs.writeFile(cache, data, function (err) {
                         if (err) throw err;
