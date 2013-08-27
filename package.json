@@ -3,8 +3,10 @@
     "version": "0.0.1",
     "dependencies":
         {
-            "request": ">=2.0.0",
-            "cheerio": ">=0.12.0"
+            "request":  ">=2.27.0",
+            "cheerio":  ">=0.12.1",
+            "data2xml": ">=0.9.0",
+            "async":    ">=0.2.9"
         },
     "private": true
 }
