@@ -65,6 +65,13 @@ function parseItem(id, html, cb) {
     item.description.find('div.edit-button').remove();
     item.description = item.description.html();
 
+    // do we have what we need?
+    if(!item.lat || !item.lon || !item.title){
+        cb(null);
+        return;
+    }
+
+
     item.info = '';
     var infos = $('#item-details ul');
     for (var j = 0; j < infos.length; j++) {
@@ -78,12 +85,12 @@ function parseItem(id, html, cb) {
     }
 
     // assemble into a single HTML page
-    item.html = '<p>' + item.teaser + '</p>' +
-                '<img src="' + item.thumbnail + '" align="center">' +
-                '<p>' + item.tags.join(', ') + '</p>' +
-                item.description +
-                item.info +
-                item.directions;
+    item.html = '<p>' + item.teaser + '</p>';
+    if(item.thumbnail) item.hmtl += '<img src="' + item.thumbnail + '" align="center">';
+    item.html += '<p>' + item.tags.join(', ') + '</p>' +
+                 item.description +
+                 item.info +
+                 item.directions;
 
     // prepare for XML wpt element
     var xml = {
