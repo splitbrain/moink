@@ -9,7 +9,7 @@ var items = [];
 var calls = [];
 
 // add all the possible IDs to our call list
-for(var i=130; i<200; i++){
+for(var i=130; i<8316; i++){ //FIXME top bound is currently newest
     calls.push(
         function(i){
             return function(callback){
@@ -116,6 +116,7 @@ function fetchItem(id, cb){
             });
         }else{
             // load URL
+            process.stderr.write(url+"\n");
             request(url, function(err, rep, data){
                 if(err) throw err;
                 if(rep.statusCode == 200){
