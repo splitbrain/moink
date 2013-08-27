@@ -111,6 +111,7 @@ function fetchItem(id, cb) {
     fs.exists(cache, function (exists) {
         if (exists) {
             // load cache file and parse it
+            process.stderr.write(cache + "\n");
             fs.readFile(cache, {encoding: 'utf-8'}, function (err, data) {
                 if (err) throw err;
                 parseItem(id, data, cb);
@@ -124,9 +125,14 @@ function fetchItem(id, cb) {
                     // write cache and parse it
                     fs.writeFile(cache, data, function (err) {
                         if (err) throw err;
-                        parseItem(id, data, cb);
+                        if (data){
+                            parseItem(id, data, cb);
+                        } else {
+                            cb(null); // this was a 404 before, ignore
+                        }
                     });
                 } else {
+                    fs.writeFile(cache, ''); // store empty cache file
                     cb(null); // we ignore 404s and return undefined
                 }
             });
