@@ -42,6 +42,11 @@ async.parallelLimit(calls, 5, function (err, results) {
  * parse data from the given HTML into a waypoint structure
  */
 function parseItem(id, html, cb) {
+    // clean for XML: http://stackoverflow.com/a/14801798/172068
+    var re = /[^\x09\x0A\x0D\x20-\xFF\x85\xA0-\uD7FF\uE000-\uFDCF\uFDE0-\uFFFD]/gm;
+    html = html.replace(re, '');
+
+
     var $ = cheerio.load(html);
     var item = {};
     item.id         = id;
