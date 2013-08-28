@@ -111,41 +111,46 @@ function fetchItem(id, cb) {
     var cache = path.resolve(__dirname, 'cache/' + id + '.html');
     var url = 'http://www.atlasobscura.com/places/' + id;
 
-    async.waterfall([
-        function (cb) {
-            // check for cache file
-            fs.exists(cache, cb.bind(null, null));
-        }, function (exists, cb) {
-            if (exists) {
-                // load cache file and parse it
-                process.stderr.write(cache + "\n");
-                fs.readFile(cache, {encoding: 'utf-8'}, cb);
+    async.waterfall(
+        [
+            function (cbTaskDone) {
+                // check for cache file
+                fs.exists(cache, cbTaskDone.bind(null, null));
+            },
+
+            function (exists, cbTaskDone) {
+                if (exists) {
+                    // load cache file and parse it
+                    process.stderr.write(cache + "\n");
+                    fs.readFile(cache, {encoding: 'utf-8'}, cbTaskDone);
+                } else {
+                    // load URL
+                    process.stderr.write(url + "\n");
+                    request(url, function (err, rep, data) {
+                        if (err) {
+                            // ignore error but don't store empty cache file
+                            process.stderr.write("Error: " + err + "\n");
+                            cbTaskDone(null);
+                        } else if (rep.statusCode == 200) {
+                            // write cache and parse it
+                            fs.writeFile(cache, data, function (err) {
+                                cbTaskDone(err, data);
+                            });
+                        } else {
+                            fs.writeFile(cache, ''); // store empty cache file
+                            cbTaskDone(null); // we ignore 404s and return undefined as result
+                        }
+                    });
+                }
+            }
+        ],
+        function (err, data) {
+            if (err) throw err;
+            if (data){
+                parseItem(id, data, cb);
             } else {
-                // load URL
-                process.stderr.write(url + "\n");
-                request(url, function (err, rep, data) {
-                    if (err) {
-                        // ignore error but don't store empty cache file
-                        process.stderr.write("Error: " + err + "\n");
-                        cb(null);
-                    } else if (rep.statusCode == 200) {
-                        // write cache and parse it
-                        fs.writeFile(cache, data, function (err) {
-                            cb(err, data);
-                        });
-                    } else {
-                        fs.writeFile(cache, ''); // store empty cache file
-                        cb(null); // we ignore 404s and return undefined
-                    }
-                });
+                cb(null); // this was a 404 before, ignore
             }
         }
-    ], function (err, data) {
-        if (err) throw err;
-        if (data){
-            parseItem(id, data, cb);
-        } else {
-            cb(null); // this was a 404 before, ignore
-        }
-    });
+    );
 }
