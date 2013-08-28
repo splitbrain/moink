@@ -11,16 +11,7 @@ var calls = [];
 
 // add all the possible IDs to our call list
 for (var i = 130; i < 8316; i++) { //FIXME top bound is currently newest
-    calls.push(
-        function (i) {
-            return function (callback) {
-                fetchItem(
-                    i,
-                    callback
-                );
-            };
-        }(i)
-    );
+    calls.push(fetchItem.bind(null, i));
 }
 // fetch all the items in parallel and come back here when done
 async.parallelLimit(calls, 5, function (err, results) {
