@@ -1,9 +1,10 @@
-var request  = require('request');
-var cheerio  = require('cheerio');
-var fs       = require('fs');
-var path     = require('path');
-var async    = require('async');
+var fs = require('fs');
+var path = require('path');
+
+var async = require('async');
+var cheerio = require('cheerio');
 var data2xml = require('data2xml')();
+var request = require('request');
 
 var items = [];
 var calls = [];
